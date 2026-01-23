@@ -1,0 +1,16 @@
+[project]
+name = "camb-pipecat-demo"
+version = "0.1.0"
+description = "CAMB AI Voice Demo with Pipecat"
+requires-python = ">=3.10"
+dependencies = [
+    "pipecat-ai[daily,silero,deepgram,openai,camb]",
+    "fastapi",
+    "uvicorn",
+    "aiohttp",
+    "python-dotenv",
+    "loguru",
+]
+
+[tool.uv]
+dev-dependencies = []
