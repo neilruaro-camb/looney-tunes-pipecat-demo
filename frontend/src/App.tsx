@@ -8,14 +8,13 @@ type AgentState = 'listening' | 'thinking' | 'speaking' | 'idle'
 type Character = {
   id: string
   name: string
-  emoji: string
-  color: string
+  avatar: string
 }
 
 const CHARACTERS: Character[] = [
-  { id: 'bugs', name: 'Bugs Bunny', emoji: '🐰', color: 'bg-gray-400' },
-  { id: 'lola', name: 'Lola Bunny', emoji: '🐇', color: 'bg-amber-400' },
-  { id: 'daffy', name: 'Daffy Duck', emoji: '🦆', color: 'bg-gray-800' },
+  { id: 'bugs', name: 'Bugs Bunny', avatar: 'https://cambai-not-ai.conbersa.ai/bugs-bunny.png' },
+  { id: 'lola', name: 'Lola Bunny', avatar: 'https://cambai-not-ai.conbersa.ai/lola-bunny.png' },
+  { id: 'daffy', name: 'Daffy Duck', avatar: 'https://cambai-not-ai.conbersa.ai/daffy-duck.png' },
 ]
 
 function App() {
@@ -182,7 +181,11 @@ function App() {
                   }
                 `}
               >
-                <span className="text-3xl mb-1">{char.emoji}</span>
+                <img
+                  src={char.avatar}
+                  alt={char.name}
+                  className="w-16 h-20 object-contain mb-1"
+                />
                 <span className={`text-xs ${isSelected ? 'text-camb-orange' : 'text-gray-400'}`}>
                   {char.name}
                 </span>
