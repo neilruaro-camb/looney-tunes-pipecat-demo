@@ -13,10 +13,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from loguru import logger
+from pydantic import BaseModel
 
 from pipecat.transports.services.helpers.daily_rest import DailyRESTHelper, DailyRoomParams
 
-from bot import run_bot
+from bot import run_bot, CHARACTERS
+
+
+class ConnectRequest(BaseModel):
+    character: str = "bugs"
 
 load_dotenv()
 
@@ -66,10 +71,14 @@ async def health():
 
 
 @app.post("/api/connect")
-async def connect(background_tasks: BackgroundTasks):
+async def connect(request: ConnectRequest, background_tasks: BackgroundTasks):
     """Create a Daily room and start the bot."""
     if not _daily_helper:
         raise HTTPException(status_code=500, detail="Daily API not configured")
+
+    # Validate character
+    if request.character not in CHARACTERS:
+        raise HTTPException(status_code=400, detail=f"Invalid character: {request.character}")
 
     try:
         # Create a temporary Daily room (expires in 10 minutes)
@@ -89,10 +98,10 @@ async def connect(background_tasks: BackgroundTasks):
         user_token = await _daily_helper.get_token(room_url=room.url, expiry_time=600)
         bot_token = await _daily_helper.get_token(room_url=room.url, expiry_time=600)
 
-        # Start the bot in the background
-        background_tasks.add_task(run_bot, room.url, bot_token)
+        # Start the bot in the background with selected character
+        background_tasks.add_task(run_bot, room.url, bot_token, request.character)
 
-        logger.info(f"Bot started, room: {room.url}")
+        logger.info(f"Bot started with character '{request.character}', room: {room.url}")
 
         return {
             "room_url": room.url,
