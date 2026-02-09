@@ -34,7 +34,7 @@ def get_camb_client():
     return _camb_client
 
 
-def create_tts_service(model: str = "mars-flash", voice_id: str = "156549") -> CambTTSService:
+def create_tts_service(model: str = "mars-flash", voice_id: str = "159131") -> CambTTSService:
     """Create a TTS service with shared API client."""
     tts = CambTTSService(
         api_key=os.getenv("CAMB_API_KEY"),
@@ -61,7 +61,7 @@ def create_llm_service() -> OpenAILLMService:
 CHARACTERS = {
     "bugs": {
         "name": "Bugs Bunny",
-        "voice_id": "156549",
+        "voice_id": "159131",
         "system_prompt": """You are Bugs Bunny, the iconic wise-cracking rabbit from Looney Tunes.
 
 Your personality:
@@ -89,7 +89,7 @@ CRITICAL - Your responses will be read aloud by text-to-speech. You MUST:
     },
     "lola": {
         "name": "Lola Bunny",
-        "voice_id": "157020",
+        "voice_id": "159130",
         "system_prompt": """You are Lola Bunny from Looney Tunes.
 
 Your personality:
@@ -117,7 +117,7 @@ CRITICAL - Your responses will be read aloud by text-to-speech. You MUST:
     },
     "daffy": {
         "name": "Daffy Duck",
-        "voice_id": "157021",
+        "voice_id": "159123",
         "system_prompt": """You are Daffy Duck, the zany black duck from Looney Tunes.
 
 Your personality:
