@@ -1,13 +1,14 @@
 """Pipecat bot for CAMB AI voice demo."""
 
 import os
+import time
 from typing import Optional
 
 from loguru import logger
 
 from pipecat.audio.vad.silero import SileroVADAnalyzer
 from pipecat.audio.vad.vad_analyzer import VADParams
-from pipecat.frames.frames import LLMRunFrame
+from pipecat.frames.frames import OutputTransportMessageFrame, TTSSpeakFrame
 from pipecat.pipeline.pipeline import Pipeline
 from pipecat.pipeline.runner import PipelineRunner
 from pipecat.pipeline.task import PipelineParams, PipelineTask
@@ -173,10 +174,7 @@ async def run_bot(room_url: str, token: str, character: str = "bugs", tts_model:
 
     messages = [
         {"role": "system", "content": char_config["system_prompt"]},
-        {
-            "role": "user",
-            "content": f"Greet the user with this exact greeting: {char_config['greeting']}",
-        },
+        {"role": "assistant", "content": char_config["greeting"]},
     ]
 
     context = LLMContext(messages)
@@ -209,7 +207,17 @@ async def run_bot(room_url: str, token: str, character: str = "bugs", tts_model:
     @transport.event_handler("on_first_participant_joined")
     async def on_first_participant_joined(transport, participant):
         logger.info(f"Participant joined: {participant['id']}")
-        await task.queue_frames([LLMRunFrame()])
+        greeting = char_config["greeting"]
+        await task.queue_frames([
+            OutputTransportMessageFrame(message={
+                "type": "transcript",
+                "role": "assistant",
+                "text": greeting,
+                "final": True,
+                "timestamp": int(time.time() * 1000),
+            }),
+            TTSSpeakFrame(greeting),
+        ])
 
     @transport.event_handler("on_participant_left")
     async def on_participant_left(transport, participant, reason):
