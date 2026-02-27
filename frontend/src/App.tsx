@@ -12,6 +12,56 @@ type Character = {
   avatar: string
 }
 
+type Theme = 'dark' | 'white' | 'transparent'
+
+function getTheme(): Theme {
+  const path = window.location.pathname
+  if (path.startsWith('/white')) return 'white'
+  if (path.startsWith('/transparent')) return 'transparent'
+  return 'dark'
+}
+
+const THEMES = {
+  dark: {
+    bg: '#0d0d0d',
+    card: '#171717',
+    border: '#262626',
+    text: '#ffffff',
+    textMuted: '#9ca3af',
+    textDimmer: '#6b7280',
+  },
+  white: {
+    bg: '#ffffff',
+    card: '#f5f5f5',
+    border: '#e5e5e5',
+    text: '#171717',
+    textMuted: '#6b7280',
+    textDimmer: '#9ca3af',
+  },
+  transparent: {
+    bg: 'transparent',
+    card: 'transparent',
+    border: 'transparent',
+    text: '#ffffff',
+    textMuted: '#9ca3af',
+    textDimmer: '#6b7280',
+  },
+}
+
+const theme = getTheme()
+const t = THEMES[theme]
+
+// Apply theme as CSS custom properties before first render
+const _root = document.documentElement
+_root.style.setProperty('--t-bg', t.bg)
+_root.style.setProperty('--t-card', t.card)
+_root.style.setProperty('--t-border', t.border)
+_root.style.setProperty('--t-text', t.text)
+_root.style.setProperty('--t-text-muted', t.textMuted)
+_root.style.setProperty('--t-text-dimmer', t.textDimmer)
+document.body.style.backgroundColor = t.bg
+document.body.style.color = t.text
+
 const CHARACTERS: Character[] = [
   { id: 'bugs', name: 'Bugs Bunny', color: '#E8784A', avatar: 'https://cambai-not-ai.conbersa.ai/bugs-bunny.png' },
   { id: 'lola', name: 'Lola Bunny', color: '#A0A0A0', avatar: 'https://cambai-not-ai.conbersa.ai/lola-bunny.png' },
@@ -171,7 +221,7 @@ function App() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-camb-bg flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-[var(--t-bg)] flex flex-col items-center justify-center p-4">
       {/* Character Selection — pill tabs */}
       <div className="flex flex-wrap gap-2 mb-6 justify-center">
         {CHARACTERS.map((char) => {
@@ -187,7 +237,7 @@ function App() {
                 ${isDisabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}
                 ${isSelected
                   ? 'bg-camb-orange/15 text-camb-orange'
-                  : 'bg-camb-card text-gray-400 hover:text-gray-300'
+                  : 'bg-[var(--t-card)] text-[var(--t-text-muted)] hover:text-[var(--t-text)]'
                 }
               `}
             >
@@ -203,12 +253,12 @@ function App() {
       </div>
 
       {/* Transcript / Status Display */}
-      <div className="max-w-2xl w-full rounded-2xl bg-camb-card border border-camb-border min-h-[160px] flex items-center justify-center px-6 py-8 mb-6">
+      <div className="max-w-2xl w-full rounded-2xl bg-[var(--t-card)] border border-[var(--t-border)] min-h-[160px] flex items-center justify-center px-6 py-8 mb-6">
         {connectionState === 'idle' && (
-          <p className="text-gray-500 text-center">Tap to start the call...</p>
+          <p className="text-[var(--t-text-dimmer)] text-center">Tap to start the call...</p>
         )}
         {connectionState === 'connecting' && (
-          <p className="text-gray-400 text-center">Connecting...</p>
+          <p className="text-[var(--t-text-muted)] text-center">Connecting...</p>
         )}
         {connectionState === 'error' && (
           <p className="text-red-400 text-center">Connection failed. Tap to retry.</p>
@@ -216,13 +266,13 @@ function App() {
         {connectionState === 'connected' && (
           <>
             {!transcript && (agentState === 'listening' || agentState === 'idle') && (
-              <p className="text-gray-400 text-center">Listening...</p>
+              <p className="text-[var(--t-text-muted)] text-center">Listening...</p>
             )}
             {!transcript && agentState === 'thinking' && (
-              <p className="text-gray-400 text-center">Thinking...</p>
+              <p className="text-[var(--t-text-muted)] text-center">Thinking...</p>
             )}
             {transcript && (
-              <p className={`text-center text-lg ${transcriptRole === 'user' ? 'text-camb-orange' : 'text-gray-200'}`}>
+              <p className={`text-center text-lg ${transcriptRole === 'user' ? 'text-camb-orange' : 'text-[var(--t-text)]'}`}>
                 {transcript}
               </p>
             )}
@@ -244,9 +294,9 @@ function App() {
           <>
             <button
               disabled
-              className="w-12 h-12 rounded-full bg-camb-card flex items-center justify-center cursor-wait"
+              className="w-12 h-12 rounded-full bg-[var(--t-card)] flex items-center justify-center cursor-wait"
             >
-              <Mic className="w-5 h-5 text-gray-500" />
+              <Mic className="w-5 h-5 text-[var(--t-text-dimmer)]" />
             </button>
             <button
               onClick={disconnect}
@@ -266,7 +316,7 @@ function App() {
                   ? 'bg-red-500/20 text-red-400 hover:bg-red-500/30'
                   : agentState === 'listening'
                     ? 'bg-white text-black hover:bg-gray-200'
-                    : 'bg-camb-card text-gray-400 hover:bg-camb-border hover:text-white'
+                    : 'bg-[var(--t-card)] text-[var(--t-text-muted)] hover:bg-[var(--t-border)] hover:text-[var(--t-text)]'
                 }
               `}
             >
