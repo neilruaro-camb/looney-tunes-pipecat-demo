@@ -10,7 +10,7 @@ import uvicorn
 from dotenv import load_dotenv
 from fastapi import BackgroundTasks, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import RedirectResponse
+from fastapi.responses import FileResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from loguru import logger
 from pydantic import BaseModel
@@ -62,6 +62,16 @@ app.add_middleware(
 async def root():
     """Redirect root to the client."""
     return RedirectResponse(url="/index.html")
+
+
+@app.get("/white")
+@app.get("/transparent")
+async def spa_fallback():
+    """Serve index.html for SPA theme routes."""
+    frontend_dir = os.path.realpath(os.path.join(os.path.dirname(__file__), "frontend", "dist"))
+    if not os.path.exists(os.path.join(frontend_dir, "index.html")):
+        frontend_dir = os.path.realpath(os.path.join(os.path.dirname(__file__), "..", "frontend", "dist"))
+    return FileResponse(os.path.join(frontend_dir, "index.html"))
 
 
 @app.get("/api/health")
